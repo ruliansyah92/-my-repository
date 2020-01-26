@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+        table {
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid black;
+            padding: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <form>
+        <label for="teamId">Id Team: </label><input id="teamId" type="number">
+        <label for="teamName">Nama Team: </label> <input id="teamName" type="text">
+        <label for="teamYear">Tahun: </label><input id="teamYear" type="number">
+        <!-- <label for="bookAuthor">Penulis: </label><input id="bookAuthor" type="author"> -->
+        <button onclick="insertTeam()">Submit</button>
+    </form>
+    <div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Id Team</th>
+                    <th>Nama Team</th>
+                    <th>Tahun</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="teamsRow"></tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+        });
+        const teamsRow = document.querySelector("#teamsRow");
+        const inputTeamId = document.querySelector("#teamId");
+        const inputTeamName = document.querySelector("#teamName");
+        const inputTeamYear = document.querySelector("#teamYear");
+
+
+        function insertTeam() {
+            const team = {
+                teamId: inputTeamId.value,
+                teamName: inputTeamName.value,
+                teamYear: inputTeamYear.value
+            };
+
+            dbInsertTeam(team).then(() => {
+                showAllTeam()
+            })
+        }
+
+        function showAllTeam() {
+            dbGetAllTeam().then(teams => {
+                let listTeamsInText = "";
+                teams.forEach(team => {
+                    listTeamsInText += `
+                <tr>
+                    <td>${team.teamId}</td>
+                    <td>${team.teamName}</td>
+                    <td>${team.teamYear}</td>
+                    <td><button id="${team.teamId}" class="removeButton">Remove</button></td>
+                </tr>
+                `;
+                });
+                teamsRow.innerHTML = listTeamsInText;
+
+                let removeButtons = document.querySelectorAll(".removeButton");
+                for (let button of removeButtons) {
+                    button.addEventListener("click", function (event) {
+                        let teamId = event.target.id;
+                        dbDeleteTeam(teamId).then(() => {
+                            showAllTeam()
+                        })
+                    })
+                }
+            })
+        }
+
+        showAllTeam()
+    </script>
+
+    <script src="/../js/idb.js"></script>
+    <script src="/../js/db-controller.js"></script>
+
+</body>
+
+</html>
